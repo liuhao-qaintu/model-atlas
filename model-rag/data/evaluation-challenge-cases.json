@@ -1,0 +1,138 @@
+[
+  {
+    "id": "challenge-01",
+    "split": "challenge",
+    "category": "comparison",
+    "annotation_origin": "assistant",
+    "reference_review": "pending",
+    "frozen_at": "2026-10-14",
+    "model_id": null,
+    "question": "比较1D CNN和ResNet-18的输入轴含义、骨干特征与分类输出。为什么不能把示例中的4类和默认1000类当作架构固定能力？",
+    "reference_answer": "Conv1d常用[B,C,L]，ResNet-18常用[B,3,H,W]；输入序列轴与图像空间轴不同。分类输出取决于分类头和任务：1D CNN教学实例的4类是示例，Torchvision ResNet-18默认1000类可修改，池化特征512维不等于1000类分数。随机初始化示例没有真实诊断能力。",
+    "relevant_section_ids": [
+      "cnn-1d:io",
+      "resnet-18:io"
+    ],
+    "cloud_allowed": true
+  },
+  {
+    "id": "challenge-02",
+    "split": "challenge",
+    "category": "comparison",
+    "annotation_origin": "assistant",
+    "reference_review": "pending",
+    "frozen_at": "2026-10-14",
+    "model_id": null,
+    "question": "CLIP和LLaVA都接收图像与文字，为什么CLIP的匹配分数不能直接当作LLaVA的文字回答？请比较输出与产生输出的模块。",
+    "reference_answer": "CLIP双编码器对齐图像和文本，匹配矩阵为[B,K]及其转置，不直接生成自然语言。LLaVA视觉编码器及投影提供视觉特征，语言模型结合指令生成文字。二者用途与输出类型不同，不把CLIP分数称为文字回答或未经校准的置信度。",
+    "relevant_section_ids": [
+      "clip:io",
+      "llava:io"
+    ],
+    "cloud_allowed": true
+  },
+  {
+    "id": "challenge-03",
+    "split": "challenge",
+    "category": "multihop",
+    "annotation_origin": "assistant",
+    "reference_review": "pending",
+    "frozen_at": "2026-10-14",
+    "model_id": null,
+    "question": "沿已有证据解释CLIP采用ViT视觉编码器时，图像如何通过patch投影变为token，再成为共享图文表示？说明每一步的来源与版本边界。",
+    "reference_answer": "在CLIP的ViT视觉变体中，patch投影、class token及位置表示构成视觉token，Transformer处理后取相应视觉表示并投影至共享维数D，forward归一化两侧表示并计算缩放相似度。CLIP视觉编码器是ViT架构变体，不等于直接调用Torchvision分类器；CLIP家族另有ModifiedResNet，不能推广为全部版本。应分别引用CLIP组成及ViT/patch机制，关系路径本身不能替代正文。",
+    "relevant_section_ids": [
+      "clip:relations",
+      "clip:io",
+      "vit:formula"
+    ],
+    "cloud_allowed": true
+  },
+  {
+    "id": "challenge-04",
+    "split": "challenge",
+    "category": "relationship",
+    "annotation_origin": "assistant",
+    "reference_review": "pending",
+    "frozen_at": "2026-10-14",
+    "model_id": null,
+    "question": "DETR采用Transformer结构，但object queries为什么不是文本提问？结合检测槽位、类别及边界框说明结构联系和任务区别。",
+    "reference_answer": "原始DETR采用Transformer encoder-decoder处理图像特征和可学习object query嵌入，query是检测槽位而非自然语言。输出是槽位的类别分数与边界框，不是翻译词表或文字回答。Transformer是结构机制，使用它不意味着任务变为文本生成；应保留原始DETR与具体结构的条件。",
+    "relevant_section_ids": [
+      "detr:io",
+      "detr:relations",
+      "transformer:overview"
+    ],
+    "cloud_allowed": true
+  },
+  {
+    "id": "challenge-05",
+    "split": "challenge",
+    "category": "followup",
+    "annotation_origin": "assistant",
+    "reference_review": "pending",
+    "frozen_at": "2026-10-14",
+    "model_id": null,
+    "prior_turns": [
+      {
+        "question": "Torchvision ResNet-18默认分类输出是什么？",
+        "model_id": null
+      }
+    ],
+    "question": "那把它的fc替换为Identity之后呢？现在的输出还能叫1000类概率吗？",
+    "reference_answer": "它指上一轮ResNet-18。替换fc为Identity后返回展平池化特征，标准ResNet-18为[B,512]，不是1000类输出或概率；原默认分类头输出也是logits而非已经softmax的概率。应结合真实前序会话消解指代。",
+    "relevant_section_ids": [
+      "resnet-18:io",
+      "resnet-18:code"
+    ],
+    "cloud_allowed": true
+  },
+  {
+    "id": "challenge-06",
+    "split": "challenge",
+    "category": "clarification",
+    "annotation_origin": "assistant",
+    "reference_review": "pending",
+    "frozen_at": "2026-10-14",
+    "model_id": null,
+    "prior_turns": [
+      {
+        "question": "比较CLIP与LLaVA的输出。",
+        "model_id": null
+      }
+    ],
+    "question": "它的输出是什么？",
+    "reference_answer": "上一轮涉及两个模型，单数代词指向不明确，应先询问用户指CLIP还是LLaVA，不能擅自选一个。该题检查澄清行为，不需要相关正文，检索召回和MRR不适用。",
+    "relevant_section_ids": [],
+    "cloud_allowed": true
+  },
+  {
+    "id": "challenge-07",
+    "split": "challenge",
+    "category": "missing_evidence",
+    "annotation_origin": "assistant",
+    "reference_review": "pending",
+    "frozen_at": "2026-10-14",
+    "model_id": null,
+    "question": "仅根据知识库告诉我：我还未上传的私有轴承数据上哪个模型能达到99%的准确率？请给出已经验证的数字。",
+    "reference_answer": "没有该私有数据、实验设置及评测记录，不能给出已验证数字或保证达到99%。必须明确缺少实验依据，可说明比较所需的数据与设置，但不能借论文其他数据集结果冒充本题结果。本题评价是否承认资料不足，没有预先声明相关章节全集。",
+    "relevant_section_ids": [],
+    "cloud_allowed": true
+  },
+  {
+    "id": "challenge-08",
+    "split": "challenge",
+    "category": "conditions",
+    "annotation_origin": "assistant",
+    "reference_review": "pending",
+    "frozen_at": "2026-10-14",
+    "model_id": null,
+    "question": "LSTM与Mamba都能输出序列特征，为什么不能直接把每个位置的特征叫类别概率？请区分隐藏维数、任务输出头与归一化。",
+    "reference_answer": "LSTM的output是隐藏表示，Mamba模块输出也可以是序列特征；隐藏维数不是类别或词表大小。分类/语言建模需对应任务头得到logits，随后按类别/词表轴归一化才得到相应分布；特征和logits都不是天然置信度。保留各接口布局和任务设置，不能因形状相似声称机制相同。",
+    "relevant_section_ids": [
+      "lstm:io",
+      "mamba:io"
+    ],
+    "cloud_allowed": true
+  }
+]

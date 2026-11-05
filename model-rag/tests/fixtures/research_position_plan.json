@@ -1,0 +1,67 @@
+{
+  "model_ids": [
+    "transformer",
+    "vit",
+    "detr"
+  ],
+  "dimensions": [
+    {
+      "id": "position_encoding_principle",
+      "label": "位置编码原理"
+    },
+    {
+      "id": "position_encoding_implementation",
+      "label": "位置编码具体实现"
+    }
+  ],
+  "queries": [
+    {
+      "tool": "search",
+      "query": "Transformer 位置编码原理 绝对位置编码 sinusoidal positional encoding",
+      "model_id": "transformer",
+      "unit_ids": [
+        "transformer|position_encoding_principle"
+      ]
+    },
+    {
+      "tool": "search",
+      "query": "Transformer 位置编码实现 代码 PyTorch 正弦余弦函数",
+      "model_id": "transformer",
+      "unit_ids": [
+        "transformer|position_encoding_implementation"
+      ]
+    },
+    {
+      "tool": "search",
+      "query": "Vision Transformer ViT 位置编码原理 图像块 patch embedding 可学习位置编码",
+      "model_id": "vit",
+      "unit_ids": [
+        "vit|position_encoding_principle"
+      ]
+    },
+    {
+      "tool": "search",
+      "query": "ViT 位置编码实现 代码 可学习参数 2D位置编码",
+      "model_id": "vit",
+      "unit_ids": [
+        "vit|position_encoding_implementation"
+      ]
+    },
+    {
+      "tool": "search",
+      "query": "DETR 位置编码原理 目标检测 查询向量 query positional encoding",
+      "model_id": "detr",
+      "unit_ids": [
+        "detr|position_encoding_principle"
+      ]
+    },
+    {
+      "tool": "search",
+      "query": "DETR 位置编码实现 代码 空间位置编码 object queries",
+      "model_id": "detr",
+      "unit_ids": [
+        "detr|position_encoding_implementation"
+      ]
+    }
+  ]
+}

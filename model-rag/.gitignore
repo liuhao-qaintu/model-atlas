@@ -1,0 +1,13 @@
+.env
+.env.*
+!.env.example
+data/*
+!data/evaluation-cases.json
+!data/evaluation-challenge-cases.json
+!data/answer-evaluation-cases.json
+exports/
+frontend/node_modules/
+frontend/dist/
+__pycache__/
+*.pyc
+.pytest_cache/

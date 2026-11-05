@@ -1,0 +1,17 @@
+**/.env
+**/.env.*
+!**/.env.example
+**/node_modules/
+**/dist/
+**/.venv/
+**/__pycache__/
+**/*.pyc
+**/*.sqlite*
+**/*.log
+**/.pytest_cache/
+**/exports/
+model-rag/data/*
+!model-rag/data/evaluation-cases.json
+!model-rag/data/evaluation-challenge-cases.json
+!model-rag/data/answer-evaluation-cases.json
+模型知识库资料/公开原始资料/

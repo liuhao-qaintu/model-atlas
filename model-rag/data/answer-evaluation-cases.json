@@ -1,0 +1,484 @@
+[
+  {
+    "id": "answer-detr-followup-v1",
+    "model_id": "detr",
+    "split": "development",
+    "category": "followup",
+    "question": "那如果图里只有3个目标，剩下的槽位怎么办？请接着上文简短说明。",
+    "prior_turns": [
+      {
+        "question": "请简短解释：DETR 的 N=100 表示什么？它等于类别数吗？",
+        "model_id": "detr"
+      }
+    ],
+    "reference_answer": "沿用DETR的N=100槽位；在含3个有效真值且完成一对一匹配的训练示例中，3个槽位匹配真值，其余97个参与no-object分类监督。原始PostProcess保留N个候选；应用可自行选择显示阈值，不能保证训练后的其余槽位在推理中一定全被正确过滤，也不能将阈值选择与mAP计算混为一谈。",
+    "relevant_section_ids": [
+      "detr:io",
+      "detr:formula",
+      "detr:code"
+    ],
+    "cloud_allowed": true,
+    "annotation_origin": "assistant",
+    "reference_review": "pending",
+    "usage": "known_failure_regression",
+    "answer_contract": {
+      "version": 2,
+      "criteria": [
+        {
+          "id": "context",
+          "dimension": "context",
+          "critical": true,
+          "text": "沿用上轮DETR的100个检测槽位，不把100当类别数。",
+          "evidence_spans": [
+            {
+              "section_id": "detr:io",
+              "quote": "N是可容纳的预测槽位数"
+            }
+          ]
+        },
+        {
+          "id": "training",
+          "dimension": "correctness",
+          "critical": true,
+          "text": "区分训练：3个真值的一对一匹配和剩余97个未匹配槽位的no-object分类监督。",
+          "evidence_spans": [
+            {
+              "section_id": "detr:formula",
+              "quote": "未匹配槽位仍参与no-object分类"
+            }
+          ]
+        },
+        {
+          "id": "postprocess",
+          "dimension": "correctness",
+          "critical": true,
+          "text": "明确作者PostProcess返回全部N个候选，不先按包含no-object的argmax删除槽位。",
+          "evidence_spans": [
+            {
+              "section_id": "detr:code",
+              "quote": "作者PostProcess仍输出所有N个候选"
+            }
+          ]
+        },
+        {
+          "id": "filter_condition",
+          "dimension": "conditions",
+          "critical": true,
+          "text": "应用可以自行设置显示阈值，但不能保证其余97个一定被过滤。若回答出现不带条件的“推理阶段则会被分数阈值过滤”，即使后面另写返回全部候选，也不通过。检查回答开头，不能用后文正确内容抵消该错误。",
+          "evidence_spans": [
+            {
+              "section_id": "detr:code",
+              "quote": "本例0.7只是显示阈值，不是论文规定的通用阈值"
+            }
+          ]
+        },
+        {
+          "id": "evaluation",
+          "dimension": "conditions",
+          "critical": true,
+          "text": "不把mAP/召回计算说成过滤、忽略或删除no-object槽位的后处理步骤。评测与应用显示阈值是不同事项。",
+          "evidence_spans": [
+            {
+              "section_id": "detr:code",
+              "quote": "作者PostProcess仍输出所有N个候选"
+            }
+          ]
+        }
+      ],
+      "sources": [
+        "https://github.com/facebookresearch/detr/blob/29901c51d7fe8712168b8d0d64351170bc0f83e0/models/detr.py#L99-L147",
+        "https://github.com/facebookresearch/detr/blob/29901c51d7fe8712168b8d0d64351170bc0f83e0/models/detr.py#L230-L256"
+      ]
+    }
+  },
+  {
+    "id": "answer-detr-queries-v1",
+    "model_id": "detr",
+    "split": "development",
+    "category": "implementation",
+    "question": "原始DETR的query_embed可学习，tgt却从零开始，这是否矛盾？请区分query身份、槽位内容和图像信息从哪里进入。",
+    "reference_answer": "不矛盾。可学习query_embed作为query_pos提供不同槽位身份；tgt是初始槽位内容，作者实现从零开始。解码器的交叉注意力通过Q=槽位内容加身份、K=图像memory加空间位置、V=图像memory读取图像。query不是文本或真实目标框，也不预先指定类别。",
+    "relevant_section_ids": [
+      "detr:mechanism"
+    ],
+    "cloud_allowed": true,
+    "annotation_origin": "assistant",
+    "reference_review": "pending",
+    "answer_contract": {
+      "version": 1,
+      "criteria": [
+        {
+          "id": "identity",
+          "dimension": "correctness",
+          "critical": true,
+          "text": "区分可学习query身份与全零初始tgt内容，不说query本身不可学习。",
+          "evidence_spans": [
+            {
+              "section_id": "detr:mechanism",
+              "quote": "另创建全零的初始`tgt`内容"
+            }
+          ]
+        },
+        {
+          "id": "image",
+          "dimension": "completeness",
+          "critical": true,
+          "text": "指出交叉注意力从图像memory读内容，Q、K、V来源符合作者实现。",
+          "evidence_spans": [
+            {
+              "section_id": "detr:mechanism",
+              "quote": "后者的Q来自槽位内容加query身份，K来自图像memory加空间位置，V来自memory"
+            }
+          ]
+        },
+        {
+          "id": "meaning",
+          "dimension": "conditions",
+          "critical": false,
+          "text": "不把槽位身份固定为类别、文本问题或真值框。",
+          "evidence_spans": [
+            {
+              "section_id": "detr:mechanism",
+              "quote": "不是自然语言问题，也不是从真实目标数量直接生成的查询"
+            }
+          ]
+        }
+      ],
+      "sources": [
+        "https://github.com/facebookresearch/detr/blob/29901c51d7fe8712168b8d0d64351170bc0f83e0/models/transformer.py#L42-L53",
+        "https://github.com/facebookresearch/detr/blob/29901c51d7fe8712168b8d0d64351170bc0f83e0/models/transformer.py#L192-L213"
+      ]
+    }
+  },
+  {
+    "id": "answer-detr-loss-v1",
+    "model_id": "detr",
+    "split": "development",
+    "category": "calculation",
+    "question": "DETR匹配中的分类成本为什么不能直接写成训练交叉熵？框A=[0,0,2,2]、B=[1,1,3,3]的IoU和GIoU各是多少？负GIoU能当概率吗？",
+    "reference_answer": "作者matcher分类成本为负的目标类别概率，正式分类训练用交叉熵；匹配是离散分配，不能混成一个损失。两框交集1、并集7、最小外接矩形9，IoU=1/7，GIoU=1/7−2/9=−5/63。GIoU可为负，是几何相似性指标，不是概率。",
+    "relevant_section_ids": [
+      "detr:formula"
+    ],
+    "cloud_allowed": true,
+    "annotation_origin": "assistant",
+    "reference_review": "pending",
+    "answer_contract": {
+      "version": 1,
+      "criteria": [
+        {
+          "id": "cost",
+          "dimension": "correctness",
+          "critical": true,
+          "text": "区分匹配负概率与训练交叉熵，不将matcher成本写成负对数概率。",
+          "evidence_spans": [
+            {
+              "section_id": "detr:formula",
+              "quote": "这里的匹配分类项是负概率，不是`-log(p)`"
+            }
+          ]
+        },
+        {
+          "id": "numbers",
+          "dimension": "correctness",
+          "critical": true,
+          "text": "交集1、并集7、外接矩形9，IoU=1/7、GIoU=−5/63，计算与结论一致。",
+          "evidence_spans": [
+            {
+              "section_id": "detr:formula",
+              "quote": "GIoU=1/7−2/9=−5/63"
+            }
+          ]
+        },
+        {
+          "id": "probability",
+          "dimension": "conditions",
+          "critical": true,
+          "text": "解释GIoU可以为负，不能当作概率。",
+          "evidence_spans": [
+            {
+              "section_id": "detr:formula",
+              "quote": "GIoU可以为负，不是概率"
+            }
+          ]
+        }
+      ],
+      "sources": [
+        "https://github.com/facebookresearch/detr/blob/29901c51d7fe8712168b8d0d64351170bc0f83e0/models/matcher.py#L57-L68",
+        "https://github.com/facebookresearch/detr/blob/29901c51d7fe8712168b8d0d64351170bc0f83e0/util/box_ops.py#L20-L55"
+      ]
+    }
+  },
+  {
+    "id": "answer-cnn-groups-v1",
+    "model_id": "cnn-1d",
+    "split": "development",
+    "category": "calculation",
+    "question": "Conv1d输入6通道、输出9通道、groups=3、kernel_size=5、bias=True。每组输入输出通道、权重形状和总参数量分别是多少？groups会把序列长度切成三段吗？",
+    "reference_answer": "每组2个输入通道、3个输出通道；权重[9,2,5]共90个，加9个偏置共99个。groups分割的是通道连接，不是序列长度。输入和输出通道数都需被groups整除。",
+    "relevant_section_ids": [
+      "cnn-1d:mechanism"
+    ],
+    "cloud_allowed": true,
+    "annotation_origin": "assistant",
+    "reference_review": "pending",
+    "answer_contract": {
+      "version": 1,
+      "criteria": [
+        {
+          "id": "groups",
+          "dimension": "correctness",
+          "critical": true,
+          "text": "每组输入2通道、输出3通道，groups划分通道连接，不切序列长度。",
+          "evidence_spans": [
+            {
+              "section_id": "cnn-1d:mechanism",
+              "quote": "这不是把序列长度分成两半"
+            }
+          ]
+        },
+        {
+          "id": "weight",
+          "dimension": "correctness",
+          "critical": true,
+          "text": "权重形状[9,2,5]，不是[9,6,5]，权重数90。",
+          "evidence_spans": [
+            {
+              "section_id": "cnn-1d:mechanism",
+              "quote": "权重形状是 `[C_out,C_in/groups,k]`"
+            }
+          ]
+        },
+        {
+          "id": "bias",
+          "dimension": "completeness",
+          "critical": true,
+          "text": "偏置9个、总参数99个，不漏偏置、不将分组数重复相乘。",
+          "evidence_spans": [
+            {
+              "section_id": "cnn-1d:mechanism",
+              "quote": "C_out×(C_in/groups)×k+C_out"
+            }
+          ]
+        }
+      ],
+      "sources": [
+        "https://docs.pytorch.org/docs/2.8/generated/torch.nn.Conv1d.html"
+      ]
+    }
+  },
+  {
+    "id": "answer-transformer-mask-v1",
+    "model_id": "transformer",
+    "split": "development",
+    "category": "conditions",
+    "question": "按PyTorch 2.6 nn.Transformer的布尔tgt_mask语义，长度3的标准因果mask中，query位置1能看哪些key？对角线需要屏蔽吗？若只令mask[1,2]=True，是否整个query1的输出都变成0？位置从0开始。",
+    "reference_answer": "标准因果mask只屏蔽未来键；位置1可看key0与key1，屏蔽key2，对角线不需屏蔽。该接口True表示禁止注意该query-key配对；只屏蔽[1,2]不等于屏蔽整行，更不能保证整个query1输出为0。残差、前馈等也参与输出。",
+    "relevant_section_ids": [
+      "transformer:masks"
+    ],
+    "cloud_allowed": true,
+    "annotation_origin": "assistant",
+    "reference_review": "pending",
+    "usage": "known_failure_regression",
+    "answer_contract": {
+      "version": 1,
+      "criteria": [
+        {
+          "id": "causal",
+          "dimension": "correctness",
+          "critical": true,
+          "text": "位置1允许key0、key1，禁止key2；标准因果限制不屏蔽对角线。",
+          "evidence_spans": [
+            {
+              "section_id": "transformer:masks",
+              "quote": "右上角 True 阻止目标位置看到后续位置"
+            }
+          ]
+        },
+        {
+          "id": "pair",
+          "dimension": "conditions",
+          "critical": true,
+          "text": "布尔True禁止指定query-key配对，第一索引是query而非batch，不泛化到所有注意力API。",
+          "evidence_spans": [
+            {
+              "section_id": "transformer:masks",
+              "quote": "二维`tgt_mask[i,j]`的i是query位置，j是key位置"
+            }
+          ]
+        },
+        {
+          "id": "zero",
+          "dimension": "correctness",
+          "critical": true,
+          "text": "不宣称仅屏蔽一个key就让整行/整个query输出为零。",
+          "evidence_spans": [
+            {
+              "section_id": "transformer:masks",
+              "quote": "不能因为屏蔽了padding键，就认定该位置作为query的输出必为0"
+            }
+          ]
+        }
+      ],
+      "sources": [
+        "https://docs.pytorch.org/docs/2.6/generated/torch.nn.Transformer.html#torch.nn.Transformer.forward"
+      ]
+    }
+  },
+  {
+    "id": "answer-resnet-freeze-v1",
+    "model_id": "resnet-18",
+    "split": "development",
+    "category": "conditions",
+    "question": "ResNet骨干参数都requires_grad=False，但保持train，BN的running_mean还可能更新吗？全部参数冻结时，普通输入和requires_grad=True的输入，在普通梯度模式与no_grad下有什么区别？eval是否等于no_grad？",
+    "reference_answer": "BN运行统计是buffer，train且追踪运行统计时仍可能更新，参数冻结不能阻止。对本题正常Linear/BN运算，参数全冻结且输入不需要梯度时输出无梯度图；输入需要梯度且处于普通梯度模式时可记录到输入的路径。no_grad内不记录该路径，但不把BN切成eval。eval影响模块模式，并不自动关闭autograd。",
+    "relevant_section_ids": [
+      "resnet-18:practice"
+    ],
+    "cloud_allowed": true,
+    "annotation_origin": "assistant",
+    "reference_review": "pending",
+    "usage": "known_failure_regression",
+    "answer_contract": {
+      "version": 1,
+      "criteria": [
+        {
+          "id": "buffers",
+          "dimension": "correctness",
+          "critical": true,
+          "text": "参数梯度与BN buffer更新分别控制，train且追踪运行统计时仍可能更新。",
+          "evidence_spans": [
+            {
+              "section_id": "resnet-18:practice",
+              "quote": "BatchNorm的running_mean、running_var是buffer"
+            }
+          ]
+        },
+        {
+          "id": "input",
+          "dimension": "conditions",
+          "critical": true,
+          "text": "参数全冻结时区分普通输入与需要梯度的输入；不说普通梯度模式必定创建计算图。",
+          "evidence_spans": [
+            {
+              "section_id": "resnet-18:practice",
+              "quote": "普通梯度模式也不保证输出有计算图"
+            }
+          ]
+        },
+        {
+          "id": "modes",
+          "dimension": "correctness",
+          "critical": true,
+          "text": "eval不等于no_grad；no_grad不自动切BN为eval，不保证停止running统计更新。",
+          "evidence_spans": [
+            {
+              "section_id": "resnet-18:practice",
+              "quote": "不会把BN切为eval，也不会阻止train模式下正常更新running统计"
+            }
+          ]
+        }
+      ],
+      "sources": [
+        "https://docs.pytorch.org/docs/2.6/notes/autograd.html#evaluation-mode-nn-module-eval",
+        "https://docs.pytorch.org/docs/2.6/generated/torch.nn.BatchNorm1d.html"
+      ]
+    }
+  },
+  {
+    "id": "answer-llava-interface-v1",
+    "model_id": "llava",
+    "split": "development",
+    "category": "implementation",
+    "question": "只谈Visual Instruction Tuning原始LLaVA：视觉特征[B,P,Dv]经线性投影后，P会变成词表大小吗？投影的输出是否已经是文字回答？由哪个模块生成回答？",
+    "reference_answer": "该线性投影逐token将Dv映射到语言模型嵌入维数Dlm，示意形状[B,P,Dlm]，不把P变为词表大小。投影产生视觉token表示，不是文字回答或词表概率；Vicuna语言模型基于视觉表示与语言指令条件生成文本/token序列。该结论限定原始线性投影设计。",
+    "relevant_section_ids": [
+      "llava:io",
+      "llava:overview"
+    ],
+    "cloud_allowed": true,
+    "annotation_origin": "assistant",
+    "reference_review": "pending",
+    "answer_contract": {
+      "version": 1,
+      "criteria": [
+        {
+          "id": "shape",
+          "dimension": "correctness",
+          "critical": true,
+          "text": "输出形状[B,P,Dlm]，线性投影改变特征维度而保留P，不把P当词表大小。",
+          "evidence_spans": [
+            {
+              "section_id": "llava:io",
+              "quote": "保留视觉 token 序列，只对每个 token 的特征维度进行线性映射"
+            }
+          ]
+        },
+        {
+          "id": "output",
+          "dimension": "correctness",
+          "critical": true,
+          "text": "视觉投影输出是表示，不是已经生成的文字或词表概率。",
+          "evidence_spans": [
+            {
+              "section_id": "llava:io",
+              "quote": "不是 CLIP 的 B×K 匹配矩阵"
+            }
+          ]
+        },
+        {
+          "id": "generator",
+          "dimension": "completeness",
+          "critical": true,
+          "text": "指出Vicuna语言模型结合图像表示与语言指令生成回答，并限定原始版本。",
+          "evidence_spans": [
+            {
+              "section_id": "llava:overview",
+              "quote": "Vicuna 语言模型负责条件生成"
+            }
+          ]
+        }
+      ],
+      "sources": [
+        "https://arxiv.org/pdf/2304.08485v2#page=4"
+      ]
+    }
+  },
+  {
+    "id": "answer-missing-evidence-v1",
+    "model_id": null,
+    "split": "development",
+    "category": "missing_evidence",
+    "question": "只根据这个知识库，告诉我尚未上传的私有轴承数据上哪个模型准确率达到99%，给出已经验证的数值。",
+    "reference_answer": "当前没有该私有数据、实验设置和验证记录，无法给出已验证99%或模型排序。应明确资料缺失，说明还需要数据与实验依据；不把公开论文或其他数据集成绩移用为该私有数据成绩。",
+    "relevant_section_ids": [],
+    "cloud_allowed": true,
+    "annotation_origin": "assistant",
+    "reference_review": "pending",
+    "usage": "known_failure_regression",
+    "answer_contract": {
+      "version": 1,
+      "evidence_required": false,
+      "reference_type": "expected_behavior",
+      "criteria": [
+        {
+          "id": "unknown",
+          "dimension": "faithfulness",
+          "critical": true,
+          "text": "明确没有该私有数据的验证依据，不能声称已获得实测99%或给出伪造数字。",
+          "evidence_spans": []
+        },
+        {
+          "id": "scope",
+          "dimension": "conditions",
+          "critical": true,
+          "text": "不把公开论文或其他数据集的性能当成这个私有数据的验证结果。",
+          "evidence_spans": []
+        }
+      ],
+      "sources": [],
+      "note": "此题评估资料不足时的回答行为；不使用虚构的原文证据，不计检索精确率或召回率。"
+    }
+  }
+]

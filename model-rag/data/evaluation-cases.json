@@ -1,0 +1,242 @@
+[
+  {
+    "id": "q01",
+    "question": "1D CNN 的输入 B、C、L 分别是什么？",
+    "model_id": "cnn-1d",
+    "reference_answer": "B是批量，C是通道，L是序列长度；PyTorch Conv1d通常采用[B,C,L]。",
+    "relevant_section_ids": [
+      "cnn-1d:io"
+    ],
+    "cloud_allowed": true
+  },
+  {
+    "id": "q02",
+    "question": "1D CNN 输出的四个值是概率吗？",
+    "model_id": "cnn-1d",
+    "reference_answer": "教学分类器输出[B,4]的logits，未归一化；四类仅为示例，随机权重不能真实诊断。",
+    "relevant_section_ids": [
+      "cnn-1d:io",
+      "cnn-1d:code"
+    ],
+    "cloud_allowed": true
+  },
+  {
+    "id": "q03",
+    "question": "卷积输出长度怎样计算？",
+    "model_id": "cnn-1d",
+    "reference_answer": "根据输入长度、padding、dilation、kernel_size和stride计算并向下取整，参数取本轮实现约定。",
+    "relevant_section_ids": [
+      "cnn-1d:formula"
+    ],
+    "cloud_allowed": true
+  },
+  {
+    "id": "q04",
+    "question": "ResNet-18 中的512与1000有什么区别？",
+    "model_id": "resnet-18",
+    "reference_answer": "默认Torchvision结构全局池化后的特征维数为512，默认分类头输出1000个类别分数；分类数可改。",
+    "relevant_section_ids": [
+      "resnet-18:io"
+    ],
+    "cloud_allowed": true
+  },
+  {
+    "id": "q05",
+    "question": "ResNet 的残差相加有什么条件？",
+    "model_id": "resnet-18",
+    "reference_answer": "残差分支与shortcut的输出形状需一致；必要时投影对齐，不等于所有块都直接原样相加。",
+    "relevant_section_ids": [
+      "resnet-18:formula",
+      "resnet-18:overview"
+    ],
+    "cloud_allowed": true
+  },
+  {
+    "id": "q06",
+    "question": "LeNet 教学实例中的400、84、10分别指什么？",
+    "model_id": "cnn-2d",
+    "reference_answer": "400为本例展平特征维数，84为隐藏层维数，10为示例类别数，依赖示例输入尺寸和结构。",
+    "relevant_section_ids": [
+      "cnn-2d:io",
+      "cnn-2d:code"
+    ],
+    "cloud_allowed": true
+  },
+  {
+    "id": "q07",
+    "question": "自编码器的4维潜在表示是4个类别吗？",
+    "model_id": "autoencoder",
+    "reference_answer": "不是，是本例潜在特征维数；输出重构输入，不是自动分类或概率。",
+    "relevant_section_ids": [
+      "autoencoder:io"
+    ],
+    "cloud_allowed": true
+  },
+  {
+    "id": "q08",
+    "question": "自编码器使用MSE重构损失意味着什么？",
+    "model_id": "autoencoder",
+    "reference_answer": "比较重构值与对应输入值的平方差，并按指定维度约简；不代表每个潜在分量有固定类别意义。",
+    "relevant_section_ids": [
+      "autoencoder:formula"
+    ],
+    "cloud_allowed": true
+  },
+  {
+    "id": "q09",
+    "question": "LSTM 的 output、h_n、c_n分别是什么？",
+    "model_id": "lstm",
+    "reference_answer": "output是最后一层逐位置隐藏输出；h_n/c_n是每层、每方向完成整段递推后的最终隐藏/细胞状态。正向终点在末位、反向终点在起始位置；普通padding不会自动被忽略。batch_first只影响输入和output布局，不改变h_n/c_n布局；投影可使隐藏和细胞维数不同。",
+    "relevant_section_ids": [
+      "lstm:io"
+    ],
+    "cloud_allowed": true
+  },
+  {
+    "id": "q10",
+    "question": "双向LSTM为何不能直接用最后时间步代替两个方向最终状态？",
+    "model_id": "lstm",
+    "reference_answer": "在batch_first=True、双向、等长无padding、hidden_size=8、无投影且L>1的示例中，h_n[-2]对应output[:,-1,:8]，h_n[-1]对应output[:,0,8:]。末位反向输出已经完成第一步更新，不是h_0，也不是整个反向最终状态；L=1时第一步也是最后一步。PackedSequence需按各有效长度取正向位置，投影时切片宽度改用Hout。",
+    "relevant_section_ids": [
+      "lstm:masks"
+    ],
+    "cloud_allowed": true
+  },
+  {
+    "id": "q11",
+    "question": "Transformer 的32、64、23分别是什么？",
+    "model_id": "transformer",
+    "reference_answer": "教学实例中的32是隐藏维数，64是前馈中间维数，23是目标词表大小，三者不可混同。",
+    "relevant_section_ids": [
+      "transformer:io",
+      "transformer:code"
+    ],
+    "cloud_allowed": true
+  },
+  {
+    "id": "q12",
+    "question": "Transformer 为什么需要因果掩码？",
+    "model_id": "transformer",
+    "reference_answer": "自回归解码时限制当前位置关注未来目标位置；padding掩码是另一种用途，布尔约定依具体接口。",
+    "relevant_section_ids": [
+      "transformer:masks"
+    ],
+    "cloud_allowed": true
+  },
+  {
+    "id": "q13",
+    "question": "ViT 教学实例为何有17个token？",
+    "model_id": "vit",
+    "reference_answer": "本例图像分成16个patch，再加一个class token，共17；是指定分辨率和patch配置的结果。",
+    "relevant_section_ids": [
+      "vit:io",
+      "vit:code"
+    ],
+    "cloud_allowed": true
+  },
+  {
+    "id": "q14",
+    "question": "ViT 的patch embedding是什么？",
+    "model_id": "vit",
+    "reference_answer": "将图像patch映射为固定隐藏维数的token，结合位置表示送入编码器，不是类别输出。",
+    "relevant_section_ids": [
+      "vit:overview",
+      "vit:formula"
+    ],
+    "cloud_allowed": true
+  },
+  {
+    "id": "q15",
+    "question": "CLIP 的图像数量B、文本数量K和共享维数D有何不同？",
+    "model_id": "clip",
+    "reference_answer": "B、K分别为两侧样本数，D是对齐特征维数；匹配矩阵为[B,K]，不等于固定分类头。",
+    "relevant_section_ids": [
+      "clip:io"
+    ],
+    "cloud_allowed": true
+  },
+  {
+    "id": "q16",
+    "question": "CLIP 对比学习为什么同时计算两个方向的损失？",
+    "model_id": "clip",
+    "reference_answer": "图像匹配文本与文本匹配图像两个方向分别归一化并结合，配对索引与矩阵方向需一致。",
+    "relevant_section_ids": [
+      "clip:formula"
+    ],
+    "cloud_allowed": true
+  },
+  {
+    "id": "q17",
+    "question": "DETR 的object queries是用户输入的自然语言问题吗？",
+    "model_id": "detr",
+    "reference_answer": "不是，原始DETR使用可学习的目标查询嵌入作为检测槽位，输出类别和边界框。",
+    "relevant_section_ids": [
+      "detr:io",
+      "detr:overview"
+    ],
+    "cloud_allowed": true
+  },
+  {
+    "id": "q18",
+    "question": "LLaVA 的回答由哪个分支产生？",
+    "model_id": "llava",
+    "reference_answer": "视觉编码与投影提供视觉特征，语言模型结合指令生成文本；视觉分支不直接输出文字回答。",
+    "relevant_section_ids": [
+      "llava:io",
+      "llava:overview"
+    ],
+    "cloud_allowed": true
+  },
+  {
+    "id": "q19",
+    "question": "DINOv2 的视觉特征怎样成为深度预测？",
+    "model_id": "dinov2",
+    "reference_answer": "视觉表示还需连接相应密集任务读出并按具体下游设置训练，骨干特征不是深度图本身。",
+    "relevant_section_ids": [
+      "dinov2:io",
+      "dinov2:applications"
+    ],
+    "cloud_allowed": true
+  },
+  {
+    "id": "q20",
+    "question": "Mamba 的[B,L,D]如何变成词表概率？",
+    "model_id": "mamba",
+    "reference_answer": "先接词表投影获得[B,L,V]未归一化分数，再在V轴应用softmax；模块特征与词表分数、概率须区分。",
+    "relevant_section_ids": [
+      "mamba:io"
+    ],
+    "cloud_allowed": true
+  },
+  {
+    "id": "q21",
+    "model_id": "lstm",
+    "question": "双向LSTM设batch_first=True、hidden_size=8、proj_size=0，右侧padding后按lengths=[3,5]打包再解包为长度5。每个样本的最终正向和反向隐藏状态分别对应output的哪个位置？为什么不能统一取最后一列？",
+    "reference_answer": "对第i个样本，正向最终状态对应output[i,lengths[i]-1,:8]，反向最终状态对应output[i,0,8:]。短样本解包后的末列是补齐位置，不能代表其正向最终状态；c_n不能直接从output切片取得。",
+    "relevant_section_ids": [
+      "lstm:io",
+      "lstm:masks"
+    ],
+    "cloud_allowed": true
+  },
+  {
+    "id": "q22",
+    "model_id": "lstm",
+    "question": "同一个双向LSTM从batch_first=False改为True，并交换输入的时间与批量轴，h_n和c_n也需要交换轴吗？请区分output布局与方向最终位置。",
+    "reference_answer": "不需要。批量output从[L,B,D×Hout]变为[B,L,D×Hout]，h_n仍为[D×num_layers,B,Hout]，c_n仍为[D×num_layers,B,hidden_size]。参数和初始状态相同时状态值一致；正向/反向终点按各自递推方向确定。",
+    "relevant_section_ids": [
+      "lstm:io"
+    ],
+    "cloud_allowed": true
+  },
+  {
+    "id": "q23",
+    "model_id": "lstm",
+    "question": "双向两层LSTM输入[B=2,L=5,F=6]，batch_first=True、hidden_size=8、proj_size=4且没有padding，output、h_n、c_n的形状是什么？最后一层两个方向的最终隐藏状态该如何切片？",
+    "reference_answer": "output=[2,5,8]，h_n=[4,2,4]，c_n=[4,2,8]。Hout=4，前向最终隐藏状态等于output[:,-1,:4]或h_n[-2]，反向最终隐藏状态等于output[:,0,4:]或h_n[-1]。不能用hidden_size=8作为方向输出的切片宽度。",
+    "relevant_section_ids": [
+      "lstm:io"
+    ],
+    "cloud_allowed": true
+  }
+]
