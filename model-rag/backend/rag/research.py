@@ -384,7 +384,8 @@ class ResearchRunner:
             try:
                 if action['tool'] == 'search':
                     result = await self.retriever.search(action['query'], action['model_id'], top_k=3, use_rerank=False,
-                        strict_focus=bool(action['model_id']), allowed_section_ids=set(self.sections), allow_remote=True)
+                        strict_focus=bool(action['model_id']), allowed_section_ids=set(self.sections), allow_remote=True,
+                        restrict_models=bool(action['model_id']))
                     for evidence in result['evidence']:
                         section = self.sections.get(evidence['section_id'])
                         if section:

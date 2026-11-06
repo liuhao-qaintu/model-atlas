@@ -433,7 +433,9 @@ async def chat_events(request, active_retriever, streaming=False):
         graph = json_paths(retrieval["paths"])
         scope = plan.get('source_scope', {})
         if retrieval.get('agentic'):
-            scope = {**scope, 'adaptive_lookup': True}
+            scope = {**scope, 'adaptive_lookup': True,
+                     'evidence_checks': retrieval['agentic'].get('final_checks', []),
+                     'check_boundary': '机器查证项目只用于组织回答，仍须逐项核对当前正文；missing/conflict 不得写成已证实的实测结论。'}
         safe_history = previous if history_is_cloud_safe(previous) else []
         messages = generation_messages(question, normalized, context, graph, warnings,
                                        response_profile, request.mode, scope, safe_history)

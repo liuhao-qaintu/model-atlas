@@ -143,6 +143,9 @@ class EvidenceLoopTests(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(any(name == 'stage' and value.get('stage') == 'evidence_check' for name, value in events))
         self.assertEqual(saved.call_args.args[3]['agentic'], result['agentic'])
         self.assertTrue(all(ref['number'] <= len(result['evidence']) for step in result['retrieval_steps'] for ref in step['references']))
+        payload = json.loads(generation.await_args_list[0].args[3]['messages'][-1]['content'])
+        self.assertEqual(payload['来源范围']['evidence_checks'], result['agentic']['final_checks'])
+        self.assertIn('机器查证项目', payload['来源范围']['check_boundary'])
 
 
 if __name__ == '__main__':

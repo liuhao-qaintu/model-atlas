@@ -18,7 +18,7 @@ const grouped = computed(() => citationGroups(evidence.value))
 const incomplete = computed(() => !props.metadata.generated && props.metadata.response_kind !== 'conversation' && !props.metadata.plan?.clarification && evidence.value.length > 0)
 const limited = computed(() => props.metadata.generation_diagnostics?.finish_reason === 'length')
 const inquiry = computed(() => props.metadata.agentic)
-const checks = computed(() => inquiry.value?.assessments?.at(-1) || [])
+const checks = computed(() => inquiry.value?.final_checks ?? inquiry.value?.assessments?.at(-1) ?? [])
 const checkLabel = status => ({ supported: '找到直接依据', inference: '可按条件推导', missing: '尚缺依据', conflict: '资料存在分歧' })[status] || status
 const answerNotes = computed(() => {
   const warnings = (props.metadata.warnings || []).join(' ')

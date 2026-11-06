@@ -241,7 +241,7 @@ class Retriever:
                     queue.append((neighbor, extended, visited | {neighbor}))
         return paths
 
-    async def search(self, query, focus=None, section_id=None, top_k=5, use_rerank=True, strict_focus=False, allow_remote=True, query_vector=None, allow_vectors=True, prefer_sources=(), source_kinds=(), excluded_source_kinds=(), retrieval_channels=None, source_boost=True, allowed_section_ids=None, document_boost=True):
+    async def search(self, query, focus=None, section_id=None, top_k=5, use_rerank=True, strict_focus=False, allow_remote=True, query_vector=None, allow_vectors=True, prefer_sources=(), source_kinds=(), excluded_source_kinds=(), retrieval_channels=None, source_boost=True, allowed_section_ids=None, document_boost=True, restrict_models=True):
         priority_time = self.priority_time
         warnings, channels = [], {}
         enabled = {'关键词', '实体/章节', '向量'} if retrieval_channels is None else set(retrieval_channels)
@@ -295,7 +295,7 @@ class Retriever:
             sections_seen = set()
             for i in sorted(eligible, key=lambda index: -scores.get(index, 0)):
                 chunk = self.chunks[i]
-                if matched and chunk['model_id'] not in matched:
+                if matched and restrict_models and chunk['model_id'] not in matched:
                     continue
                 kind = self.document_kinds.get(chunk.get('document_id'))
                 if kind not in preferred_kinds or (kind == 'official_code' and '```' not in chunk['parent_content']):
@@ -310,8 +310,8 @@ class Retriever:
             order = list(dict.fromkeys([*channels['原始来源'], *order]))
         if focus and focus in self.models and not self.models[focus]["searchable"] and len(matched) <= 1:
             order = []
-        # 当前两张卡很小，优先保持所问模型范围；比较问题允许多个对象。
-        if matched:
+        # 模型名用于相关性召回；跨文献工具可放开此软范围，授权章节与严格对象仍不能越过。
+        if matched and (restrict_models or strict_focus):
             order = [i for i in order if self.chunks[i]["model_id"] in matched]
         ranking = [{'_index': i, 'section_id': self.chunks[i]['section_id'], 'document_id': self.chunks[i].get('document_id'),
                     'score': scores[i], 'retrieval_relevant': bool(keyword_scores[i] > 0 or i in channels.get('向量', []))} for i in order]
